@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twibbon Pengajian</title>
-    <link rel="stylesheet" href="style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -26,20 +25,8 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
-        p {
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .guide {
-            font-size: 14px;
-            color: #555;
-            margin-top: 20px;
-        }
-        .guide b {
-            color: #000;
-        }
         button {
-            background-color: #28a745; /* Warna hijau untuk tombol */
+            background-color: #28a745;
             width: 100%;
             padding: 12px;
             font-size: 18px;
@@ -49,7 +36,6 @@
             color: white;
             cursor: pointer;
         }
-
         button:hover {
             background-color: #218838;
         }
@@ -60,96 +46,104 @@
         <h1>Twibbon Pengajian Miftahul Huda</h1>
         <p>Selamat datang di Twibbon Generator! Ikuti langkah berikut untuk membuat Twibbon untuk Pengajian Miftahul Huda.</p>
 
-        <!-- Canvas for Twibbon -->
         <div class="canvas-container">
             <canvas id="twibbonCanvas" width="600" height="900"></canvas>
         </div>
 
-        <!-- Upload Photo -->
         <div class="section">
             <label for="uploadPhoto">1. Upload Foto:</label>
             <input type="file" id="uploadPhoto" accept="image/*">
         </div>
 
-        <!-- Tombol untuk Memindahkan Foto ke Bawah Twibbon -->
         <button id="moveToTwibbonBtn" onclick="moveToTwibbon()" disabled>Posisikan Foto di Bawah Twibbon</button>
-
-        <!-- Tombol Unduh -->
         <button id="downloadBtn" onclick="downloadImage()" disabled>Unduh Twibbon</button>
-
-        <!-- Panduan Pengguna -->
-        <div class="guide">
-            <p><b>Langkah 1:</b> Klik tombol "Upload Foto" untuk memilih foto dari perangkat Anda.</p>
-            <p><b>Langkah 2:</b> Setelah foto diunggah, foto akan otomatis ditampilkan di kanvas.</p>
-            <p><b>Langkah 3:</b> Geser dan zoom foto menggunakan layar sentuh atau mouse untuk menyesuaikan foto Anda dengan Twibbon.</p>
-            <p><b>Langkah 4:</b> Setelah puas dengan hasilnya, klik tombol "Posisikan Foto di Bawah Twibbon" untuk memindahkan foto ke bawah desain Twibbon, kemudian klik "Unduh Twibbon".</p>
-        </div>
     </div>
 
     <script>
-        const canvas = document.getElementById("twibbonCanvas");
-        const ctx = canvas.getContext("2d");
+        const canvas = document.getElementById('twibbonCanvas');
+        const ctx = canvas.getContext('2d');
 
-        const twibbonImage = new Image();
-        const photoImage = new Image();
-        let photoLoaded = false;
-        let photoPositioned = false;
+        let uploadedImage = null;
+        let imgX = 0, imgY = 0, imgWidth = 600, imgHeight = 900;
+        let isDragging = false;
+        let startX, startY;
 
-        // Muat template Twibbon
-        twibbonImage.src = "twibbon.png";
-        twibbonImage.onload = function () {
-            ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height); // Gambar Twibbon sebagai latar belakang
-        };
-
-        // Event listener untuk upload foto
-        document.getElementById("uploadPhoto").addEventListener("change", function (e) {
-            const file = e.target.files[0];
+        // Event listener untuk mengunggah foto
+        document.getElementById('uploadPhoto').addEventListener('change', function(e) {
             const reader = new FileReader();
-
-            reader.onload = function (event) {
-                photoImage.src = event.target.result;
+            reader.onload = function(event) {
+                uploadedImage = new Image();
+                uploadedImage.onload = function() {
+                    imgWidth = uploadedImage.width;
+                    imgHeight = uploadedImage.height;
+                    imgX = (canvas.width - imgWidth) / 2;
+                    imgY = (canvas.height - imgHeight) / 2;
+                    drawImage();
+                };
+                uploadedImage.src = event.target.result;
             };
-
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(e.target.files[0]);
         });
 
-        // Ketika foto sudah dimuat, gambar foto di atas Twibbon
-        photoImage.onload = function () {
-            photoLoaded = true;
-            updateCanvas();
-        };
-
-        // Fungsi untuk memperbarui canvas dengan foto
-        function updateCanvas() {
-            if (photoLoaded && !photoPositioned) {
-                // Clear canvas terlebih dahulu
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                // Gambar template Twibbon di belakang
-                ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
-                // Gambar foto pengguna di atas Twibbon
-                const photoX = 50; // Atur posisi horizontal
-                const photoY = 100; // Atur posisi vertikal
-                const photoWidth = canvas.width - 100; // Sesuaikan ukuran foto
-                const photoHeight = (photoWidth / photoImage.width) * photoImage.height; // Menjaga rasio
-                ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
+        // Fungsi untuk menggambar gambar di canvas
+        function drawImage() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Bersihkan canvas
+            if (uploadedImage) {
+                ctx.drawImage(uploadedImage, imgX, imgY, imgWidth, imgHeight);
             }
         }
 
+        // Mengatur interaksi drag untuk menggeser gambar
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.offsetX > imgX && e.offsetX < imgX + imgWidth && e.offsetY > imgY && e.offsetY < imgY + imgHeight) {
+                isDragging = true;
+                startX = e.offsetX - imgX;
+                startY = e.offsetY - imgY;
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                imgX = e.offsetX - startX;
+                imgY = e.offsetY - startY;
+                drawImage(); // Gambar ulang setelah posisi gambar berubah
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false; // Hentikan drag saat mouse dilepas
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            isDragging = false; // Hentikan drag jika mouse keluar dari canvas
+        });
+
+        // Mengatur interaksi zoom untuk memperbesar atau memperkecil gambar
+        canvas.addEventListener('wheel', (e) => {
+            const scaleFactor = 1.1; // Faktor zoom
+            if (e.deltaY < 0) {
+                imgWidth *= scaleFactor;
+                imgHeight *= scaleFactor;
+            } else {
+                imgWidth /= scaleFactor;
+                imgHeight /= scaleFactor;
+            }
+
+            // Mengatur posisi gambar agar tetap berada di dalam canvas setelah zoom
+            imgX = Math.max(0, Math.min(imgX, canvas.width - imgWidth));
+            imgY = Math.max(0, Math.min(imgY, canvas.height - imgHeight));
+
+            drawImage(); // Gambar ulang setelah ukuran gambar berubah
+        });
+
         // Fungsi untuk memindahkan foto ke bawah Twibbon
         function moveToTwibbon() {
-            if (photoLoaded) {
-                // Foto diposisikan di bawah template Twibbon
-                const photoX = 50; // Atur posisi horizontal
-                const photoY = 200; // Atur posisi vertikal di bawah Twibbon
-                const photoWidth = canvas.width - 100; // Sesuaikan ukuran foto
-                const photoHeight = (photoWidth / photoImage.width) * photoImage.height; // Menjaga rasio
-                // Clear canvas terlebih dahulu dan gambar Twibbon
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
-                // Gambar foto yang sudah dipindahkan ke bawah Twibbon
-                ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
-                photoPositioned = true;
-                document.getElementById("downloadBtn").disabled = false; // Aktifkan tombol download
+            if (uploadedImage) {
+                imgX = 50; // Atur posisi horizontal
+                imgY = 200; // Atur posisi vertikal di bawah Twibbon
+                imgWidth = canvas.width - 100; // Sesuaikan ukuran foto
+                imgHeight = (imgWidth / uploadedImage.width) * uploadedImage.height; // Menjaga rasio
+                drawImage(); // Gambar ulang dengan posisi yang baru
             }
         }
 
