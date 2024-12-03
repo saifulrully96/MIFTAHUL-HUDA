@@ -45,56 +45,11 @@ function drawImage() {
     }
 }
 
-// Mengatur interaksi drag untuk menggeser gambar
-canvas.addEventListener('mousedown', (e) => {
-    if (e.offsetX > imgX && e.offsetX < imgX + imgWidth && e.offsetY > imgY && e.offsetY < imgY + imgHeight) {
-        isDragging = true;
-        startX = e.offsetX - imgX;
-        startY = e.offsetY - imgY;
-    }
-});
-
-canvas.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-        imgX = e.offsetX - startX;
-        imgY = e.offsetY - startY;
-        drawImage(); // Gambar ulang setelah posisi gambar berubah
-    }
-});
-
-canvas.addEventListener('mouseup', () => {
-    isDragging = false; // Hentikan drag saat mouse dilepas
-});
-
-canvas.addEventListener('mouseout', () => {
-    isDragging = false; // Hentikan drag jika mouse keluar dari canvas
-});
-
-// Mengatur interaksi zoom untuk memperbesar atau memperkecil gambar
-canvas.addEventListener('wheel', (e) => {
-    const scaleFactor = 1.1; // Faktor zoom
-    const prevWidth = imgWidth;
-    const prevHeight = imgHeight;
-    
-    if (e.deltaY < 0) {
-        imgWidth *= scaleFactor;
-        imgHeight *= scaleFactor;
-    } else {
-        imgWidth /= scaleFactor;
-        imgHeight /= scaleFactor;
-    }
-
-    // Menyesuaikan posisi gambar agar tetap berada di tengah setelah zoom
-    imgX = imgX - (imgWidth - prevWidth) / 2;
-    imgY = imgY - (imgHeight - prevHeight) / 2;
-
-    drawImage(); // Gambar ulang setelah ukuran gambar berubah
-});
-
-// Fungsi untuk memindahkan gambar yang diunggah ke bawah template twibbon
+// Fungsi untuk memindahkan gambar yang diunggah ke bawah desain twibbon
 document.getElementById('moveToBottom').addEventListener('click', function() {
     if (uploadedImage) {
-        imgY = canvas.height - imgHeight; // Pindahkan gambar ke bawah
+        // Pindahkan gambar ke bawah twibbon
+        imgY = canvas.height - imgHeight - 50; // Pindahkan ke bawah dengan jarak 50px dari bagian bawah canvas
         drawImage(); // Gambar ulang setelah gambar dipindahkan
     }
 });
