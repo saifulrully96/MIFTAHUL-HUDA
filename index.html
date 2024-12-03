@@ -60,15 +60,15 @@
         <h1>Twibbon Pengajian Miftahul Huda</h1>
         <p>Selamat datang di Twibbon Generator! Ikuti langkah berikut untuk membuat Twibbon untuk Pengajian Miftahul Huda.</p>
 
+        <!-- Canvas for Twibbon -->
+        <div class="canvas-container">
+            <canvas id="twibbonCanvas" width="600" height="900"></canvas>
+        </div>
+
         <!-- Upload Photo -->
         <div class="section">
             <label for="uploadPhoto">1. Upload Foto:</label>
             <input type="file" id="uploadPhoto" accept="image/*">
-        </div>
-
-        <!-- Canvas for Twibbon -->
-        <div class="canvas-container">
-            <canvas id="twibbonCanvas" width="600" height="900"></canvas>
         </div>
 
         <!-- Tombol Unduh -->
@@ -86,15 +86,60 @@
     <script src="script.js"></script>
 
     <script>
-        // Menambahkan JavaScript untuk mengunduh gambar dari canvas
-        function downloadImage() {
-            var canvas = document.getElementById("twibbonCanvas"); // Mengambil elemen canvas
-            var dataUrl = canvas.toDataURL("image/png"); // Mengubah canvas menjadi data URL (gambar PNG)
+        const canvas = document.getElementById("twibbonCanvas");
+        const ctx = canvas.getContext("2d");
 
-            var link = document.createElement("a"); // Membuat elemen link
-            link.href = dataUrl; // Menetapkan data URL sebagai URL gambar
-            link.download = "twibbon.png"; // Menetapkan nama file untuk diunduh
-            link.click(); // Memulai proses pengunduhan
+        const twibbonImage = new Image();
+        const photoImage = new Image();
+        let photoLoaded = false;
+
+        // Muat template Twibbon
+        twibbonImage.src = "twibbon.png";
+        twibbonImage.onload = function () {
+            ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height); // Gambar Twibbon sebagai latar belakang
+        };
+
+        // Event listener untuk upload foto
+        document.getElementById("uploadPhoto").addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                photoImage.src = event.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        });
+
+        // Ketika foto sudah dimuat, gambar foto di atas Twibbon
+        photoImage.onload = function () {
+            photoLoaded = true;
+            updateCanvas();
+        };
+
+        // Fungsi untuk memperbarui canvas dengan foto
+        function updateCanvas() {
+            if (photoLoaded) {
+                // Clear canvas terlebih dahulu
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // Gambar template Twibbon di belakang
+                ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
+                // Gambar foto pengguna di atas Twibbon
+                const photoX = 50; // Atur posisi horizontal
+                const photoY = 100; // Atur posisi vertikal
+                const photoWidth = canvas.width - 100; // Sesuaikan ukuran foto
+                const photoHeight = (photoWidth / photoImage.width) * photoImage.height; // Menjaga rasio
+                ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
+            }
+        }
+
+        // Fungsi untuk mengunduh gambar Twibbon yang sudah jadi
+        function downloadImage() {
+            const dataUrl = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataUrl;
+            link.download = "twibbon.png";
+            link.click();
         }
     </script>
 </body>
