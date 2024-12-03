@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twibbon Pengajian</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        canvas {
+            border: 2px solid #ccc;
+            margin-top: 20px;
+        }
+        input[type="file"] {
+            margin-top: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .guide {
+            font-size: 14px;
+            color: #555;
+            margin-top: 20px;
+        }
+        .guide b {
+            color: #000;
+        }
+        button#downloadBtn {
+            background-color: #28a745; /* Warna hijau untuk tombol download */
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        button#downloadBtn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Twibbon Pengajian Miftahul Huda</h1>
+        <p>Selamat datang di Twibbon Generator! Ikuti langkah berikut untuk membuat Twibbon untuk Pengajian Miftahul Huda.</p>
+
+        <!-- Upload Photo -->
+        <div class="section">
+            <label for="uploadPhoto">1. Upload Foto:</label>
+            <input type="file" id="uploadPhoto" accept="image/*">
+        </div>
+
+        <!-- Canvas for Twibbon -->
+        <div class="canvas-container">
+            <canvas id="twibbonCanvas" width="600" height="900"></canvas>
+        </div>
+
+        <!-- Tombol Unduh -->
+        <button id="downloadBtn" onclick="downloadImage()">Unduh Twibbon</button>
+
+        <!-- Panduan Pengguna -->
+        <div class="guide">
+            <p><b>Langkah 1:</b> Klik tombol "Upload Foto" untuk memilih foto dari perangkat Anda.</p>
+            <p><b>Langkah 2:</b> Setelah foto diunggah, foto akan otomatis ditampilkan di kanvas.</p>
+            <p><b>Langkah 3:</b> Geser dan zoom foto menggunakan layar sentuh atau mouse untuk menyesuaikan foto Anda dengan Twibbon.</p>
+            <p><b>Langkah 4:</b> Setelah puas dengan hasilnya, Anda bisa mengunduh Twibbon yang sudah jadi.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+    <script>
+        // Menambahkan JavaScript untuk mengunduh gambar dari canvas
+        function downloadImage() {
+            var canvas = document.getElementById("twibbonCanvas"); // Mengambil elemen canvas
+            var dataUrl = canvas.toDataURL("image/png"); // Mengubah canvas menjadi data URL (gambar PNG)
+
+            var link = document.createElement("a"); // Membuat elemen link
+            link.href = dataUrl; // Menetapkan data URL sebagai URL gambar
+            link.download = "twibbon.png"; // Menetapkan nama file untuk diunduh
+            link.click(); // Memulai proses pengunduhan
+        }
+    </script>
+</body>
+</html>
