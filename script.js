@@ -90,3 +90,20 @@ canvas.addEventListener('wheel', (e) => {
 
     drawImage(); // Gambar ulang setelah ukuran gambar berubah
 });
+
+// Fungsi untuk memindahkan gambar yang diunggah ke bawah template twibbon
+document.getElementById('moveToBottom').addEventListener('click', function() {
+    if (uploadedImage) {
+        imgY = canvas.height - imgHeight; // Pindahkan gambar ke bawah
+        drawImage(); // Gambar ulang setelah gambar dipindahkan
+    }
+});
+
+// Fungsi untuk mendownload gambar hasil canvas
+document.getElementById('downloadImage').addEventListener('click', function() {
+    const dataURL = canvas.toDataURL('image/png'); // Menghasilkan data URL gambar PNG
+    const link = document.createElement('a');
+    link.href = dataURL;
+    link.download = 'twibbon_result.png'; // Nama file hasil unduhan
+    link.click(); // Mengunduh gambar
+});
