@@ -38,8 +38,8 @@
         .guide b {
             color: #000;
         }
-        button#downloadBtn {
-            background-color: #28a745; /* Warna hijau untuk tombol download */
+        button {
+            background-color: #28a745; /* Warna hijau untuk tombol */
             width: 100%;
             padding: 12px;
             font-size: 18px;
@@ -50,7 +50,7 @@
             cursor: pointer;
         }
 
-        button#downloadBtn:hover {
+        button:hover {
             background-color: #218838;
         }
     </style>
@@ -71,15 +71,18 @@
             <input type="file" id="uploadPhoto" accept="image/*">
         </div>
 
+        <!-- Tombol untuk Memindahkan Foto ke Bawah Twibbon -->
+        <button id="moveToTwibbonBtn" onclick="moveToTwibbon()" disabled>Posisikan Foto di Bawah Twibbon</button>
+
         <!-- Tombol Unduh -->
-        <button id="downloadBtn" onclick="downloadImage()">Unduh Twibbon</button>
+        <button id="downloadBtn" onclick="downloadImage()" disabled>Unduh Twibbon</button>
 
         <!-- Panduan Pengguna -->
         <div class="guide">
             <p><b>Langkah 1:</b> Klik tombol "Upload Foto" untuk memilih foto dari perangkat Anda.</p>
             <p><b>Langkah 2:</b> Setelah foto diunggah, foto akan otomatis ditampilkan di kanvas.</p>
             <p><b>Langkah 3:</b> Geser dan zoom foto menggunakan layar sentuh atau mouse untuk menyesuaikan foto Anda dengan Twibbon.</p>
-            <p><b>Langkah 4:</b> Setelah puas dengan hasilnya, Anda bisa mengunduh Twibbon yang sudah jadi.</p>
+            <p><b>Langkah 4:</b> Setelah puas dengan hasilnya, klik tombol "Posisikan Foto di Bawah Twibbon" untuk memindahkan foto ke bawah desain Twibbon, kemudian klik "Unduh Twibbon".</p>
         </div>
     </div>
 
@@ -92,6 +95,7 @@
         const twibbonImage = new Image();
         const photoImage = new Image();
         let photoLoaded = false;
+        let photoPositioned = false;
 
         // Muat template Twibbon
         twibbonImage.src = "twibbon.png";
@@ -119,7 +123,7 @@
 
         // Fungsi untuk memperbarui canvas dengan foto
         function updateCanvas() {
-            if (photoLoaded) {
+            if (photoLoaded && !photoPositioned) {
                 // Clear canvas terlebih dahulu
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 // Gambar template Twibbon di belakang
@@ -130,6 +134,24 @@
                 const photoWidth = canvas.width - 100; // Sesuaikan ukuran foto
                 const photoHeight = (photoWidth / photoImage.width) * photoImage.height; // Menjaga rasio
                 ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
+            }
+        }
+
+        // Fungsi untuk memindahkan foto ke bawah Twibbon
+        function moveToTwibbon() {
+            if (photoLoaded) {
+                // Foto diposisikan di bawah template Twibbon
+                const photoX = 50; // Atur posisi horizontal
+                const photoY = 200; // Atur posisi vertikal di bawah Twibbon
+                const photoWidth = canvas.width - 100; // Sesuaikan ukuran foto
+                const photoHeight = (photoWidth / photoImage.width) * photoImage.height; // Menjaga rasio
+                // Clear canvas terlebih dahulu dan gambar Twibbon
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(twibbonImage, 0, 0, canvas.width, canvas.height);
+                // Gambar foto yang sudah dipindahkan ke bawah Twibbon
+                ctx.drawImage(photoImage, photoX, photoY, photoWidth, photoHeight);
+                photoPositioned = true;
+                document.getElementById("downloadBtn").disabled = false; // Aktifkan tombol download
             }
         }
 
